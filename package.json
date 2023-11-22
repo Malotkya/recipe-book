@@ -2,9 +2,11 @@
   "name": "recipe-book",
   "version": "1.0.0",
   "description": "Home Recipe Book",
-  "main": "build/index.js",
+  "main": "build/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "debug": "set DEBUG='recipe-book:*' & node build/bin/server.js",
+    "dev": "npm run build && npm run debug"
   },
   "repository": {
     "type": "git",
