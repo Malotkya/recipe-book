@@ -9,6 +9,17 @@ export default class Collection {
         this._target = target;
     }
 
+    clear():Promise<void> {
+        return new Promise((resolve, reject)=>{
+            fs.writeFile(this._target, "", (err)=>{
+                if(err)
+                    reject(err);
+                else
+                    resolve();
+            });
+        });
+    }
+
     getDocument(ref:string):Promise<DatabaseDocument|null>{
         return new Promise((resolve, reject)=>{
 
@@ -35,7 +46,7 @@ export default class Collection {
                     largest = number;
 
             })).on("error", reject)
-                .on("close", ()=>{
+                .on("finish", ()=>{
                     const now:number = Date.now();
                     if(now <= largest)
                         resolve(String(largest+1));
@@ -57,35 +68,51 @@ export default class Collection {
                     reject(new Error(`Document '${data.ref}' already exists!`));
             }
 
-            fs.appendFile(this._target, JSON.stringify(data)+"\n", (err)=>{
-                if(err)
-                    reject(err);
+            try {
+                fs.appendFileSync(this._target, JSON.stringify(data)+"\n");
+            } catch (e){
+                reject(e);
+            }
+            resolve(data);
+        });
+    }
 
-                resolve(data);
-            });
+    count():Promise<number> {
+        return new Promise(async(resolve, reject)=>{
+            let count:number = 0;
+            fs.createReadStream(this._target)
+                .on("error", reject)
+            .pipe(new FilterStream((doc)=>{
+                count++;
+            })).on("error", reject)
+                .on("finish", ()=>resolve(count));
         });
     }
 
     updateDocument(update:DatabaseDocument):Promise<void>{
         return new Promise((resolve, reject)=>{
             let done:boolean = false;
-
-            fs.createReadStream(this._target)
-                .on("error", reject)
-            .pipe(new FilterStream((doc):DatabaseDocument|void=>{
+            const insertStream = new FilterStream((doc):DatabaseDocument|void=>{
                 if(!done && doc.ref === update.ref){
                     done = true;
                     return update;
                 }
-            })).on("error", reject)
-            .pipe(fs.createWriteStream(this._target))
-                .on("error", reject)
-                .on("close", ()=>{
-                    if(done === false)
-                        reject(new Error("Document was not in database!"));
+            })
 
-                    resolve();
-                })
+            fs.createReadStream(this._target)
+                .on("error", reject)
+            .pipe(insertStream).on("error", reject)
+                .on("finish", ()=>{
+                    insertStream.pipe(fs.createWriteStream(this._target))
+                        .on("error", reject)
+                        .on("close", ()=>{
+                            if(done === false)
+                                reject(new Error("Document was not in database!"));
+
+                            resolve();
+                        })
+                });
+                
         });
     }
 
@@ -102,7 +129,7 @@ export default class Collection {
             })).on("error", reject)
             .pipe(fs.createWriteStream(this._target))
                 .on("error", reject)
-                .on("close", resolve);
+                .on("finish", resolve);
         })
     }
 
@@ -124,7 +151,7 @@ export default class Collection {
                     output.push(doc);
 
             })).on("error", reject)
-                .on("close", ()=>resolve(output));
+                .on("finish", ()=>resolve(output));
         })
     }
 }

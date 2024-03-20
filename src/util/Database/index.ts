@@ -25,7 +25,7 @@ export default class Database{
         const collection:string = path.join(this._directory, name);
 
         if(fs.existsSync(collection)){
-            if(fs.statSync(this._directory).isDirectory())
+            if(fs.statSync(collection).isDirectory())
                 throw new Error("Collection name is not valid!");
         } else {
             fs.writeFileSync(collection, "");
