@@ -4,12 +4,14 @@
       "noImplicitAny": true,
       "esModuleInterop": true,
       "module": "commonjs",
-      "target": "es6",
+      "target": "ES2017",
       "moduleResolution": "node",
-      "outDir": "build",
       "strict": true,
+      "outDir": "test",
+      "sourceMap": true
     },
     "exclude": [
+      "test",
       "build",
       "node_modules",
       "public"

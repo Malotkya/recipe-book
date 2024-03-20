@@ -4,6 +4,7 @@
   "description": "Home Recipe Book",
   "main": "build/app.js",
   "scripts": {
+    "test": "tsc && jest ./test",
     "webpack:dev": "npx webpack-cli --env dev",
     "webpack:prod": "npx webpack-cli --env prod",
     "ncc:dev": "ncc build ./src/bin/server.ts -o ./build --source-map",
@@ -38,6 +39,9 @@
   },
   "private": true,
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "@types/jest": "^29.5.12",
+    "concurrently": "^8.2.2",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2"
   }
 }
