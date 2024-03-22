@@ -1,6 +1,7 @@
 import path from "path";
 import fs from "fs";
 import Collection from "./Collection";
+export {Collection};
 
 const HOME:string = process.cwd();
 
