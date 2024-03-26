@@ -30,7 +30,7 @@ export default class FilterStream extends Transform {
             
             const update = this._filter(test);
             if(update === undefined) {
-                this.push(JSON.stringify(test)+'\n');
+                this.push(line+'\n');
             } else if(update){
                 this.push(JSON.stringify(update)+'\n');
             }
