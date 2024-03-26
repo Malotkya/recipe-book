@@ -61,7 +61,7 @@ test("Collection Reference Test", async()=>{
         throw new Error("Document was not Found!");
 });
 
-test("Delete Test", async()=>{
+test("Document Delete Test", async()=>{
     const database = new Database("test");
     const collection = database.collection("deleteTest");
     const data = {name: "Ben Wyatt", location: "Pawni, IN"};
